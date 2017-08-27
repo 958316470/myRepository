@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN 2.0//EN" "http://www.springframework.org/dtd/spring-beans-2.0.dtd">
+<beans>
+    <!-- 执行的任务 -->
+    <bean id="myFirstTrigger" class="com.xyd.triggers.MyFirstTrigger"/>
+    <!-- 调度业务 -->
+    <bean id="myFirstTriggerDetail" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+        <property name="targetObject" ref="myFirstTrigger" />
+        <property name="targetMethod" value="execute" />
+        <property name="concurrent" value="false" />
+    </bean>
+
+    <bean id="myFirstTriggerTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+        <property name="jobDetail" ref="myFirstTriggerDetail" />
+        <property name="cronExpression" value="10/10 * * * * ?"/>
+        <property name="jobDataAsMap">
+            <map>
+                <entry key="JOBID" value="myFirstTrigger" />
+                <entry key="JOBName" value="测试" />
+                <entry key="JOBAuthor" value="xyd" />
+                <entry key="JOBStartDate" value="2017年8月19日10:59:39" />
+            </map>
+        </property>
+    </bean>
+</beans>
