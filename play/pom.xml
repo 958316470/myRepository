@@ -32,11 +32,33 @@
             <artifactId>spring</artifactId>
             <version>2.5.6</version>
         </dependency>
-
+        <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.4</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.htmlparser/htmlparser -->
+        <dependency>
+            <groupId>org.htmlparser</groupId>
+            <artifactId>htmlparser</artifactId>
+            <version>2.1</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/commons-httpclient/commons-httpclient -->
+        <dependency>
+            <groupId>commons-httpclient</groupId>
+            <artifactId>commons-httpclient</artifactId>
+            <version>3.1</version>
+        </dependency>
         <dependency>
             <groupId>org.quartz-scheduler</groupId>
             <artifactId>quartz</artifactId>
             <version>1.8.4</version>
+        </dependency>
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.17</version>
         </dependency>
     </dependencies>
     <build>
@@ -109,18 +131,20 @@
             </plugin>
             <!-- jetty插件 -->
             <plugin>
-                <groupId>org.mortbay.jetty</groupId>
+                <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-maven-plugin</artifactId>
-                <version>8.1.16.v20140903</version>
+                <version>9.3.7.v20160115</version>
                 <configuration>
-                    <webAppSourceDirectory>${basedir}/webapp</webAppSourceDirectory>
-                    <scanIntervalSeconds>10</scanIntervalSeconds>
-                    <contextPath>/res</contextPath>
-                    <connectors>
-                        <connector implementation="org.eclipse.jetty.server.nio.SelectChannelConnector">
-                            <port>8080</port>
-                        </connector>
-                    </connectors>
+                    <!-- 扫面间隔 -->
+                    <scanIntervalSeconds>1</scanIntervalSeconds>
+                    <httpConnector>
+                        <!-- 端口号 -->
+                        <port>8080</port>
+                    </httpConnector>
+                    <webApp>
+                        <!-- 上下文根 -->
+                        <contextPath>/play</contextPath>
+                    </webApp>
                 </configuration>
             </plugin>
         </plugins>
