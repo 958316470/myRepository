@@ -34,7 +34,7 @@ public class Test01 {
         }
     }
 
-    public static boolean downloadPage(String path,Map<String,String> param) throws HttpException,IOException{
+    private static boolean downloadPage(String path, Map<String, String> param) throws HttpException,IOException{
         log.info("访问地址："+path);
         //0.初始化变量
         InputStream inputStream = null;

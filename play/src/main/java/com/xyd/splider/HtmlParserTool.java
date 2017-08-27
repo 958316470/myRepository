@@ -16,22 +16,16 @@ import java.util.Set;
  * 解析HTML页面中的URL
  * Created by DXM_0020 on 2017/5/26.
  */
-public class HtmlParserTool {
+class HtmlParserTool {
 
-    public static Set<String > extracLinks(String url,LinkFilter filter){
+    static Set<String > extracLinks(String url, LinkFilter filter){
         Set<String> links = new HashSet<>();
         try {
             Parser parser = new Parser(url);
             parser.setEncoding(SpliederConfiger.encoding);
-            NodeFilter nodeFilter = new NodeFilter() {
-                @Override
-                public boolean accept(Node node) {
-                    // 过滤 <frame >标签的 filter，用来提取 frame 标签里的 src 属性
-                    if(node.getText().startsWith(SpliederConfiger.frameStart)){
-                        return true;
-                    }
-                    return false;
-                }
+            NodeFilter nodeFilter = (NodeFilter) node -> {
+                // 过滤 <frame >标签的 filter，用来提取 frame 标签里的 src 属性
+                return node.getText().startsWith(SpliederConfiger.frameStart);
             };
             // OrFilter 来设置过滤 <a> 标签和 <frame> 标签
             OrFilter orFilter = new OrFilter(new NodeClassFilter(LinkTag.class),nodeFilter);

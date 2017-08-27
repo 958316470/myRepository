@@ -20,19 +20,11 @@ public class MyCrawler {
 
     /**
      * 执行抓取过程
-     * @param seeds
+     * @param seeds 种子 URL
      */
-    public  void crawling(String[] seeds){
+    private void crawling(String[] seeds){
         //1.定义过滤的URL，只属于这个网站的接受。可改进为数组。
-        LinkFilter linkFilter = new LinkFilter() {
-            @Override
-            public boolean accept(String url) {
-                if(url.startsWith(SpliederConfiger.acceptUrl)){
-                    return true;
-                }
-                return false;
-            }
-        };
+        LinkFilter linkFilter = url -> url.startsWith(SpliederConfiger.acceptUrl);
         //2.初始化种子url
         initCrawlerWithSeeds(seeds);
         //3.循环条件：待抓取的链接不空且抓取的网页不多于 1000

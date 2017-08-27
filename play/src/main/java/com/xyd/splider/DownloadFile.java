@@ -12,7 +12,7 @@ import java.io.*;
  * 下载文件
  * Created by DXM_0020 on 2017/5/25.
  */
-public class DownloadFile {
+class DownloadFile {
 
     private static Logger log = Logger.getLogger(DownloadFile.class);
     /**
@@ -20,9 +20,9 @@ public class DownloadFile {
      *
      * @param url 访问的URL
      * @param contentType 响应类型 text/···
-     * @return
+     * @return 文件的名字
      */
-    public String getFileNameByUrl(String url,String contentType){
+    private String getFileNameByUrl(String url, String contentType){
         //1.移除http://
         if(url.startsWith("https")){
             url = url.substring(8);
@@ -30,7 +30,7 @@ public class DownloadFile {
             url = url.substring(7);
         }
         //2.判断响应类型，并对其处理
-        if(contentType.indexOf("html")!=-1){
+        if(contentType.contains("html")){
             //text/html
             url = url.replaceAll("[\\?/:*|<>\"]","_")+".html";
         }else{
@@ -46,10 +46,10 @@ public class DownloadFile {
      * @param br 网页中字节数据输入流
      * @param filePath 文件的相对路径
      */
-    public void saveToLocal(BufferedReader br,String filePath){
+    private void saveToLocal(BufferedReader br, String filePath){
         try {
             DataOutputStream out = new DataOutputStream(new FileOutputStream(new File(filePath)));
-            String result="";
+            String result;
            while ((result = br.readLine())!=null){
                 out.writeUTF(result);
             }
@@ -61,10 +61,10 @@ public class DownloadFile {
         }
     }
 
-    public String downLoadFile(String url){
+    void downLoadFile(String url){
         log.info("下载文件访问的："+url);
         //0.初始化变量
-        String filePath = null;
+        String filePath;
         HttpClient httpClient = new HttpClient();
         //1.设置连接超时5S
         httpClient.getHttpConnectionManager().getParams().setConnectionTimeout(5000);
@@ -108,6 +108,5 @@ public class DownloadFile {
                 e.printStackTrace();
             }
         }
-        return filePath;
     }
 }

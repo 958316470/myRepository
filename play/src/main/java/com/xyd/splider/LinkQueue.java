@@ -17,7 +17,7 @@ public class LinkQueue {
     private static Queue queue = new Queue();
 
     //添加访问过的URL
-    public static void addVisitedUrl(String url){
+    static void addVisitedUrl(String url){
         visitedUrl.add(url);
     }
 
@@ -32,23 +32,23 @@ public class LinkQueue {
     }
 
     //未访问的URL出队列
-    public static Object unVisitedUrlDeQueue(){
+    static Object unVisitedUrlDeQueue(){
         return queue.deQueue();
     }
 
     //获得已经访问的URL数目
-    public static int getVisitedUrlNum(){
+    static int getVisitedUrlNum(){
         return visitedUrl.size();
     }
     //保证保证每个 URL 只被访问一次
-    public static void addUnVisitedUrl(String url){
+    static void addUnVisitedUrl(String url){
         if(StringUtils.isNotEmpty(url) && !visitedUrl.contains(url) && !queue.cotains(url)){
             queue.enQueue(url);
         }
     }
 
     //判断未访问的队列是否为空
-    public static boolean unVisitedUrlIsEmpty(){
+    static boolean unVisitedUrlIsEmpty(){
         return queue.isEmpty();
     }
 }
