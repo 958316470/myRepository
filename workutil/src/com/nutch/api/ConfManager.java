@@ -6,6 +6,11 @@ import org.apache.hadoop.conf.Configuration;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * 配置文件管理类
+ *
+ * @author 95831
+ */
 public interface ConfManager {
 
     public Set<String> list();
