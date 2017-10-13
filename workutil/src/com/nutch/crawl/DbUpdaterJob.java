@@ -60,7 +60,14 @@ public class DbUpdaterJob extends NutchTool implements Tool{
         getConf().set(Nutch.BATCH_NAME_KEY,batchId);
         ScoringFilters scoringFilters = new ScoringFilters(getConf());
         HashSet<WebPage.Field> fields = new HashSet<>(FIELDS);
-        //fields.addAll(scoringFilters.);
+        fields.addAll(scoringFilters.getFields());
+        currentJob = NutchJob.getInstance(getConf(),"update-table");
+        if (crawlId != null) {
+            currentJob.getConfiguration().set(Nutch.CRAWL_ID_KEY,crawlId);
+        }
+        currentJob.setPartitionerClass(UrlOnlyPartitioner.class);
+        currentJob.setSortComparatorClass(UrlScoreComparator.class);
+        currentJob.setGroupingComparatorClass(UrlOnlyComparator.class);
         return null;
     }
 

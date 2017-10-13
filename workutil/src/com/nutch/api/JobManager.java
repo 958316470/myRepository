@@ -6,6 +6,11 @@ import com.nutch.api.model.response.JobInfo.State;
 
 import java.util.Collection;
 
+/**
+ * 任务管理类
+ *
+ * @author 95831
+ */
 public interface JobManager {
     public static enum JobType{
         INJECT,GENERATE,FETCH,PARSE,UPDATEDB,INDEX,READDB,CLASS
