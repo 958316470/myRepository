@@ -65,9 +65,9 @@ public class DbUpdaterJob extends NutchTool implements Tool{
         if (crawlId != null) {
             currentJob.getConfiguration().set(Nutch.CRAWL_ID_KEY,crawlId);
         }
-        currentJob.setPartitionerClass(UrlOnlyPartitioner.class);
-        currentJob.setSortComparatorClass(UrlScoreComparator.class);
-        currentJob.setGroupingComparatorClass(UrlOnlyComparator.class);
+        currentJob.setPartitionerClass(UrlWithScore.UrlOnlyPartitioner.class);
+        currentJob.setSortComparatorClass(UrlWithScore.UrlScoreComparator.class);
+        currentJob.setGroupingComparatorClass(UrlWithScore.UrlOnlyComparator.class);
         return null;
     }
 
