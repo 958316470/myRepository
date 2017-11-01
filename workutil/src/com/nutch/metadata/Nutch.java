@@ -3,7 +3,7 @@ package com.nutch.metadata;
 import org.apache.avro.util.Utf8;
 import org.apache.hadoop.io.Text;
 
-public class Nutch {
+public interface Nutch {
 
     public static final String ORIGINAL_CHAR_ENCODING = "OriginalCharEncoding";
 

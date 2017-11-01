@@ -53,8 +53,52 @@ public class ScoreDatum implements Writable{
         for (int i = 0; i < size; i++) {
             String key = Text.readString(dataInput);
             byte[] value = Bytes.readByteArray(dataInput);
-            metaData.put(key,null);
+            metaData.put(key,value);
         }
+    }
+
+    public float getScore() {
+        return score;
+    }
+
+    public void setScore(float score) {
+        this.score = score;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public String getAnchor() {
+        return anchor;
+    }
+
+    public void setAnchor(String anchor) {
+        this.anchor = anchor;
+    }
+
+    public int getDistance() {
+        return distance;
+    }
+
+    public void setDistance(int distance) {
+        this.distance = distance;
+    }
+
+    public byte[] getMetaData(String key) {
+        return metaData.get(key);
+    }
+
+    public byte[] deleteMeta(String key) {
+        return metaData.remove(key);
+    }
+
+    public void setMetaData(String key, byte[] value) {
+        this.metaData.put(key, value);
     }
 
     @Override

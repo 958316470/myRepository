@@ -5,6 +5,7 @@ import com.nutch.scoring.ScoringFilters;
 import com.nutch.storage.WebPage;
 import com.nutch.util.NutchTool;
 import org.apache.avro.util.Utf8;
+import org.apache.gora.filter.MapFieldValueFilter;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.util.Tool;
 import org.slf4j.Logger;
@@ -68,11 +69,18 @@ public class DbUpdaterJob extends NutchTool implements Tool{
         currentJob.setPartitionerClass(UrlWithScore.UrlOnlyPartitioner.class);
         currentJob.setSortComparatorClass(UrlWithScore.UrlScoreComparator.class);
         currentJob.setGroupingComparatorClass(UrlWithScore.UrlOnlyComparator.class);
+        MapFieldValueFilter<String, WebPage> batchIdFilter = getBatchIdFilter(batchId);
+        StorageUtils.initReducerJob(currentJob, DbUpdateReducer.class);
+        currentJob.waitForCompletion(true);
+        ToolUtil.recordJobStatus(null, currentJob, results);
         return null;
     }
 
     @Override
     public int run(String[] strings) throws Exception {
         return 0;
+    }
+    private MapFieldValueFilter<String, WebPage> getBatchIdFilter(String batchId) {
+
     }
 }
