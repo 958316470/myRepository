@@ -2,6 +2,7 @@ package com.nutch.crawl;
 
 import com.nutch.metadata.Nutch;
 import com.nutch.scoring.ScoringFilters;
+import com.nutch.storage.StorageUtils;
 import com.nutch.storage.WebPage;
 import com.nutch.util.NutchTool;
 import org.apache.avro.util.Utf8;

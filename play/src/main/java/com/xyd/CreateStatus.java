@@ -8,10 +8,10 @@ import java.util.List;
 public class CreateStatus {
 
     public static void main(String[] args) {
-        String className = "ParseStatus";
-        String[] nameArr = {"majorCode","minorCode","args"};
-        String[] typeArr = {"Integer","Integer","List<CharSequence>"};
-        String schema = "{\"type\":\"record\",\"name\":\"ParseStatus\",\"namespace\":\"org.apache.nutch.storage\",\"doc\":\"A nested container representing parse status data captured from invocation of parsers on fetch of a WebPage\",\"fields\":[{\"name\":\"majorCode\",\"type\":\"int\",\"doc\":\"Major parsing status' including NOTPARSED (Parsing was not performed), SUCCESS (Parsing succeeded), FAILED (General failure. There may be a more specific error message in arguments.)\",\"default\":0},{\"name\":\"minorCode\",\"type\":\"int\",\"doc\":\"Minor parsing status' including SUCCESS_OK - Successful parse devoid of anomalies or issues, SUCCESS_REDIRECT - Parsed content contains a directive to redirect to another URL. The target URL can be retrieved from the arguments., FAILED_EXCEPTION - Parsing failed. An Exception occured which may be retrieved from the arguments., FAILED_TRUNCATED - Parsing failed. Content was truncated, but the parser cannot handle incomplete content., FAILED_INVALID_FORMAT - Parsing failed. Invalid format e.g. the content may be corrupted or of wrong type., FAILED_MISSING_PARTS - Parsing failed. Other related parts of the content are needed to complete parsing. The list of URLs to missing parts may be provided in arguments. The Fetcher may decide to fetch these parts at once, then put them into Content.metadata, and supply them for re-parsing., FAILED_MISING_CONTENT - Parsing failed. There was no content to be parsed - probably caused by errors at protocol stage.\",\"default\":0},{\"name\":\"args\",\"type\":{\"type\":\"array\",\"items\":\"string\"},\"doc\":\"Optional arguments supplied to compliment and/or justify the parse status code.\",\"default\":[]}]}";
+        String className = "Host";
+        String[] nameArr = {"metadata","outlinks","inlinks"};
+        String[] typeArr = {"Map<CharSequence,ByteBuffer>","Map<CharSequence, CharSequence>","Map<CharSequence, CharSequence>"};
+        String schema = "";
         String sourceString = head(className,schema,typeArr) + Filed(nameArr,typeArr)+endFile(nameArr,typeArr,className);   //待写入字符串
         String path = "F:/work/"+className+".java";
         byte[] sourceByte = sourceString.getBytes();
@@ -151,7 +151,7 @@ public class CreateStatus {
                 if (typeArr[i].contains("List")) {
                     temp = "List";
                 }
-                builder.append("case " + i + ":\n" + nameArr[i] + " = (" + typeArr[i] + ") ((value instanceof Dirtyable) ? value : new DirtyListWrapper((" + temp + ")value));\nbreak;\n");
+                builder.append("case " + i + ":\n" + nameArr[i] + " = (" + typeArr[i] + ") ((value instanceof Dirtyable) ? value : new Dirty"+temp+"Wrapper((" + temp + ")value));\nbreak;\n");
             } else {
                 builder.append("case " + i + ":\n" + nameArr[i] + " = (" + typeArr[i] + ") value;\nbreak;\n");
             }
@@ -277,7 +277,7 @@ public class CreateStatus {
             if (type.contains("List")) {
                 temp = "List";
             }
-            return "record." +name+" = fieldSetFlags()["+value+"] ? this." +name + " : (" + type +") new DirtyListWrapper(("+temp+")defaultValue(fields()["+value+"]));\n" ;
+            return "record." +name+" = fieldSetFlags()["+value+"] ? this." +name + " : (" + type +") new Dirty"+temp+"Wrapper(("+temp+")defaultValue(fields()["+value+"]));\n" ;
         }else {
             return "record." +name+" = fieldSetFlags()["+value+"] ? this." +name + " : (" + type +")defaultValue(fields()["+value+"]);\n" ;
         }
