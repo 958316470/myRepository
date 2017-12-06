@@ -1,9 +1,11 @@
 package com.nutch.storage;
 
+import com.nutch.util.Bytes;
 import org.apache.avro.AvroRuntimeException;
 import org.apache.avro.Schema;
 import org.apache.avro.data.RecordBuilder;
 import org.apache.avro.specific.SpecificRecordBuilderBase;
+import org.apache.avro.util.Utf8;
 import org.apache.gora.persistency.Dirtyable;
 import org.apache.gora.persistency.Persistent;
 import org.apache.gora.persistency.impl.DirtyMapWrapper;
@@ -14,7 +16,7 @@ import java.util.Map;
 public class Host extends org.apache.gora.persistency.impl.PersistentBase implements org.apache.avro.specific.SpecificRecord,
         org.apache.gora.persistency.Persistent {
     public static final org.apache.avro.Schema SCHEMA$ = new org.apache.avro.Schema.Parser()
-            .parse("{\"type\":\"record\",\"name\":\"Host\",\"namespace\":\"org.apache.nutch.storage\",\"doc\":\"Host represents a store of webpages or other data which resides on a server or other computer so that it can be accessed over the Internet\",\"fields\":[{\"name\":\"metadata\",\"type\":{\"type\":\"map\",\"values\":[\"null\",\"bytes\"]},\"doc\":\"A multivalued metadata container used for storing a wide variety of host metadata such as structured web server characterists etc\",\"default\":{}},{\"name\":\"outlinks\",\"type\":{\"type\":\"map\",\"values\":[\"null\",\"string\"]},\"doc\":\"Hyperlinks which direct outside of the current host domain these can used in a histogram style manner to generate host statistics\",\"default\":{}},{\"name\":\"inlinks\",\"type\":{\"type\":\"map\",\"values\":[\"null\",\"string\"]},\"doc\":\"Hyperlinks which link to pages within the current host domain these can used in a histogram style manner to generate host statistics\",\"default\":{}}]}");
+            .parse("{\"type\":\"record\",\"name\":\"Host\",\"namespace\":\"com.nutch.storage\",\"doc\":\"Host represents a store of webpages or other data which resides on a server or other computer so that it can be accessed over the Internet\",\"fields\":[{\"name\":\"metadata\",\"type\":{\"type\":\"map\",\"values\":[\"null\",\"bytes\"]},\"doc\":\"A multivalued metadata container used for storing a wide variety of host metadata such as structured web server characterists etc\",\"default\":{}},{\"name\":\"outlinks\",\"type\":{\"type\":\"map\",\"values\":[\"null\",\"string\"]},\"doc\":\"Hyperlinks which direct outside of the current host domain these can used in a histogram style manner to generate host statistics\",\"default\":{}},{\"name\":\"inlinks\",\"type\":{\"type\":\"map\",\"values\":[\"null\",\"string\"]},\"doc\":\"Hyperlinks which link to pages within the current host domain these can used in a histogram style manner to generate host statistics\",\"default\":{}}]}");
 
 
     public static enum Field {
@@ -263,6 +265,28 @@ public class Host extends org.apache.gora.persistency.impl.PersistentBase implem
         return newBuilder().build();
     }
 
+    public boolean contains(String key) {
+        return metadata.containsKey(new Utf8(key));
+    }
+    public String getValue(String key, String defaultValue) {
+        if (!contains(key)) {
+            return defaultValue;
+        }
+        return Bytes.toString(metadata.get(new Utf8(key)));
+    }
+    public int getInt(String key, int defaultValue) {
+        if (!contains(key)) {
+            return defaultValue;
+        }
+        return Integer.parseInt(getValue(key,null));
+    }
+
+    public long getLong(String key, long defaultValue) {
+        if (!contains(key)) {
+            return defaultValue;
+        }
+        return Long.parseLong(getValue(key,null));
+    }
     private static final Tombstone TOMBSTONE = new Tombstone();
 
     public static final class Tombstone extends Host implements org.apache.gora.persistency.Tombstone {

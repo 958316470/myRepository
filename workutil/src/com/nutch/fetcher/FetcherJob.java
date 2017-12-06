@@ -1,13 +1,18 @@
-package com.nutch.crawl;
+package com.nutch.fetcher;
 
-import com.nutch.fetcher.FetchEntry;
+import com.nutch.crawl.GeneratorJob;
+import com.nutch.crawl.NutchJob;
+import com.nutch.crawl.ParserJob;
+import com.nutch.crawl.URLPartitioner;
 import com.nutch.metadata.Nutch;
+import com.nutch.protocol.ProtocolFactory;
 import com.nutch.storage.Mark;
 import com.nutch.storage.StorageUtils;
 import com.nutch.storage.WebPage;
 import com.nutch.util.NutchConfiguration;
 import com.nutch.util.NutchTool;
 import com.nutch.util.TableUtil;
+import com.nutch.util.ToolUtil;
 import org.apache.avro.util.Utf8;
 import org.apache.gora.filter.FilterOp;
 import org.apache.gora.filter.MapFieldValueFilter;
@@ -87,7 +92,7 @@ public class FetcherJob extends NutchTool implements Tool {
             ParserJob parserJob = new ParserJob();
             fields.addAll(parserJob.getFields(job));
         }
-        ProtocolFactory protocolFactory = new ProtocolFactoory(job.getConfiguration());
+        ProtocolFactory protocolFactory = new ProtocolFactory(job.getConfiguration());
         fields.addAll(protocolFactory.getFields());
         return fields;
     }
@@ -123,8 +128,8 @@ public class FetcherJob extends NutchTool implements Tool {
         currentJob.setReduceSpeculativeExecution(false);
         Collection<WebPage.Field> fields = getFields(currentJob);
         MapFieldValueFilter<String, WebPage> batchIdFilter = getBatchIdFilter(batchId);
-        StorageUtils.initMapperJob(currentJob, fields, IntWritable.class, FetchEntry.class, FetcherMapper.class, FetchEntryPartitioner.class, batchIdFilter, false);
-        StorageUtils.initMapperJob(currentJob,FetcherReducer.class);
+        StorageUtils.initMapperJob(currentJob, fields, IntWritable.class, FetchEntry.class, FetcherMapper.class, URLPartitioner.FetchEntryPartitioner.class, batchIdFilter, false);
+        StorageUtils.initReducerJob(currentJob,FetcherReducer.class);
         if (numTasks == null || numTasks < 1) {
             currentJob.setNumReduceTasks(currentJob.getConfiguration().getInt("mapred.map.tasks",currentJob.getNumReduceTasks()));
         } else {

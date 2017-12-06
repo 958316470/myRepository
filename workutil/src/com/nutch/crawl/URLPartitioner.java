@@ -4,6 +4,7 @@ import com.nutch.fetcher.FetchEntry;
 import com.nutch.net.URLNormalizers;
 import com.nutch.storage.WebPage;
 import com.nutch.util.TableUtil;
+import com.nutch.util.URLUtil;
 import org.apache.hadoop.conf.Configurable;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.IntWritable;

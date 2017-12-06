@@ -5,6 +5,7 @@ import com.nutch.storage.StorageUtils;
 import com.nutch.storage.WebPage;
 import com.nutch.util.NutchConfiguration;
 import com.nutch.util.NutchTool;
+import com.nutch.util.ToolUtil;
 import org.apache.gora.util.TimingUtil;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.Text;
@@ -109,7 +110,7 @@ public class GeneratorJob extends NutchTool implements Tool {
             return true;
         }
 
-        public void eet(String url, float score) {
+        public void set(String url, float score) {
             this.url = url;
             this.score = score;
         }

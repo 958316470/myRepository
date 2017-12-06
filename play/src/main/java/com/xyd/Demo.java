@@ -5,22 +5,32 @@ import org.apache.commons.lang3.StringUtils;
 public class Demo {
 
     public static void main(String[] args) {
-        String[] nameArr = {"SUCCESS","FAILED","PROTO_NOT_FOUND",
-                "GONE","MOVED","TEMP_MOVED","NOTFOUND",
-        "RETRY","EXCEPTION","ACCESS_DENIED","ROBOTS_DENIED",
-        "REDIR_EXCEEDED","NOTFETCHING","NOTMODIFIED","WOULDBLOCK","BLOCKED"};
-        int[] valueArr = {1,2,10,11,12,13,14,15,16,17,18,19,20,21,22,23};
-        if(nameArr.length == valueArr.length) {
-            for(int i=0;i<nameArr.length;i++) {
-                System.out.println(formatStr(nameArr[i],valueArr[i]));
-            }
-        }
+        Integer value = 4;
+        out(value);
     }
 
     public static String formatStr(String name,int value) {
         return "public static final ProtocolStatus STATUS_" + name.toUpperCase() + " = makeStatus(" + name + ");";
     }
 
+    public static void out(Integer language) {
+        if((language==1)||(language==3)||(language==4)){
+           System.out.println(language);
+        }
+    }
+
+    private AuthBean parseToAuthBean(String userInfo) {
+        AuthBean authBean = new AuthBean();
+        for(String user : userInfo.split("\\|")){
+            System.out.println(user);
+        }
+
+        authBean.setCustomID(userInfo.split("\\|")[0]);
+        authBean.setUserNick(userInfo.split("\\|")[1]);
+        authBean.setUserId(userInfo.split("\\|")[2]);
+        authBean.setOrigin("01");
+        return authBean;
+    }
 
 
 

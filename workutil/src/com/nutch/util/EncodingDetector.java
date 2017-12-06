@@ -2,6 +2,7 @@ package com.nutch.util;
 
 import com.ibm.icu.text.CharsetDetector;
 import com.ibm.icu.text.CharsetMatch;
+import com.nutch.net.protocols.Response;
 import com.nutch.storage.WebPage;
 import org.apache.avro.util.Utf8;
 import org.apache.hadoop.conf.Configuration;

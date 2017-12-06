@@ -1,5 +1,6 @@
 package com.nutch.crawl;
 
+import com.nutch.fetcher.FetcherJob;
 import com.nutch.net.protocols.HttpDateFormat;
 import com.nutch.scoring.ScoreDatum;
 import com.nutch.scoring.ScoringFilter;

@@ -99,7 +99,7 @@ public class StringUtil {
         return (str == null) || (str.equals(""));
     }
 
-    public static String cleanFiled(String value) {
+    public static String cleanField(String value) {
         return value.replaceAll("�", "");
     }
 

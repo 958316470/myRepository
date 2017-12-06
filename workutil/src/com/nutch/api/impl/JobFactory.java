@@ -2,7 +2,7 @@ package com.nutch.api.impl;
 
 import com.google.common.collect.Maps;
 import com.nutch.api.JobManager.JobType;
-import com.nutch.crawl.FetcherJob;
+import com.nutch.fetcher.FetcherJob;
 import com.nutch.crawl.IndexingJob;
 import com.nutch.crawl.GeneratorJob;
 import com.nutch.crawl.InjectorJob;
