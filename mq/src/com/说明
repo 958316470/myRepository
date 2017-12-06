@@ -1,0 +1,16 @@
+
+1.运行ActiveMQ
+解压缩apache-activemq-5.8.0-bin.zip，然后双击apache-activemq-5.5.1\bin\activemq.bat运行ActiveMQ程序。
+
+启动ActiveMQ以后，登陆：http://localhost:8161/admin/，创建一个Queue，命名为FirstQueue。
+
+
+创建java project：ActiveMQ-5.8，新建lib文件夹
+打开apache-activemq-5.8.0\lib目录
+拷贝
+activemq-broker-5.8.0.jar
+activemq-client-5.8.0.jar
+geronimo-j2ee-management_1.1_spec-1.0.1.jar
+geronimo-jms_1.1_spec-1.1.1.jar
+slf4j-api-1.6.6.jar
+这5个jar文件到lib文件夹中,并Build Path->Add to Build Path
