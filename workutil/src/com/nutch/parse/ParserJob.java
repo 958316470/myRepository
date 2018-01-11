@@ -1,5 +1,8 @@
-package com.nutch.crawl;
+package com.nutch.parse;
 
+import com.nutch.crawl.GeneratorJob;
+import com.nutch.crawl.NutchJob;
+import com.nutch.crawl.SignatureFactory;
 import com.nutch.metadata.HttpHeaders;
 import com.nutch.metadata.Nutch;
 import com.nutch.storage.Mark;
@@ -141,7 +144,7 @@ public class ParserJob extends NutchTool implements Tool{
         Configuration conf = job.getConfiguration();
         Collection<WebPage.Field> fields = new HashSet<WebPage.Field>(FIELDS);
         ParserFactory parserFactory = new ParserFactory(conf);
-        ParserFilters parserFilters = new ParserFilters(conf);
+        ParseFilters parserFilters = new ParseFilters(conf);
         Collection<WebPage.Field> parsePluginFields = parserFactory.getFields();
         Collection<WebPage.Field> signaturePluginFields = SignatureFactory.getFields(conf);
         Collection<WebPage.Field> htmlParsePluginFields = parserFilters.getFields();

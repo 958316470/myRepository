@@ -2,12 +2,18 @@ package com.nutch.protocol;
 
 import com.nutch.metadata.Metadata;
 import com.nutch.util.MimeUtil;
+import com.nutch.util.NutchConfiguration;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.ArrayFile;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.VersionMismatchException;
 import org.apache.hadoop.io.Writable;
+import org.apache.hadoop.util.GenericOptionsParser;
 
 import java.io.*;
+import java.util.Arrays;
 import java.util.zip.InflaterInputStream;
 
 public class Content implements Writable {
@@ -161,5 +167,75 @@ public class Content implements Writable {
         this.content = content;
     }
 
+    public String getContentType(){
+        return contentType;
+    }
 
+    public void setContentType(String contentType) {
+        this.contentType = contentType;
+    }
+
+    public Metadata getMetadata() {
+        return metadata;
+    }
+
+    public void setMetadata(Metadata metadata) {
+        this.metadata = metadata;
+    }
+
+    @Override
+    public boolean equals(Object o){
+        if (!(o instanceof  Content)) {
+            return false;
+        }
+        Content that = (Content) o;
+        return this.url.equals(that.url) && this.base.equals(that.base)
+                && Arrays.equals(this.getContent(), that.getContent())
+                && this.contentType.equals(that.contentType)
+                && this.metadata.equals(that.metadata);
+    }
+
+    @Override
+    public String toString() {
+        StringBuffer buffer = new StringBuffer();
+        buffer.append("Version: " + version + "\n");
+        buffer.append("url: " + url + "\n");
+        buffer.append("base: " + base + "\n");
+        buffer.append("contentType: " + contentType + "\n");
+        buffer.append("metadate: " + metadata + "\n");
+        buffer.append("Content:\n");
+        buffer.append(new String(content));
+        return buffer.toString();
+
+    }
+
+    public static void main(String[] args) throws Exception{
+        String usage = "Content (-local | -dfs <namenode:port>) recno batchId";
+        if(args.length < 3) {
+            System.out.println("usage: " + usage);
+            return;
+        }
+        GenericOptionsParser optionsParser = new GenericOptionsParser(NutchConfiguration.create(), args);
+        String[] argv = optionsParser.getRemainingArgs();
+        Configuration conf = optionsParser.getConfiguration();
+        FileSystem fs = FileSystem.get(conf);
+        try {
+            int recno = Integer.parseInt(argv[0]);
+            String batchId = argv[1];
+            Path file = new Path(batchId, DIR_NAME);
+            System.out.println("Reading from file: " + file);
+            ArrayFile.Reader contents = new ArrayFile.Reader(fs, file.toString(), conf);
+            Content content = new Content();
+            contents.get(recno, content);
+            System.out.println("Retrieved " + recno + " from file " + file);
+            System.out.println(content);
+            contents.close();
+        } finally {
+            fs.close();
+        }
+    }
+
+    private String getContentType(String typeName, String url, byte[] data) {
+        return this.mineTypes.autoResolveContentType(typeName, url, data);
+    }
 }

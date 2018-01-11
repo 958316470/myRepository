@@ -1,0 +1,229 @@
+package com.nutch.parse;
+
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import com.nutch.crawl.CrawlStatus;
+import com.nutch.crawl.Signature;
+import com.nutch.crawl.SignatureFactory;
+import com.nutch.fetcher.FetcherJob;
+import com.nutch.net.URLFilterException;
+import com.nutch.net.URLFilters;
+import com.nutch.net.URLNormalizers;
+import com.nutch.storage.Mark;
+import com.nutch.storage.WebPage;
+import com.nutch.util.TableUtil;
+import com.nutch.util.URLUtil;
+import org.apache.avro.util.Utf8;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.conf.Configured;
+import org.apache.hadoop.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.nio.ByteBuffer;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+
+public class ParseUtil extends Configured{
+
+    public static final Logger LOG = LoggerFactory.getLogger(ParseUtil.class);
+
+    private static final int DEFAULT_MAX_PARSE_TIME = 30;
+
+    private Configuration conf;
+    private Signature sig;
+    private URLFilters filters;
+    private URLNormalizers normalizers;
+    private int maxOutlinks;
+    private boolean ignoreExternalLinks;
+    private ParserFactory parserFactory;
+    private int maxParseTime;
+    private ExecutorService executorService;
+
+    public ParseUtil(Configuration conf) {
+        super(conf);
+        setConf(conf);
+    }
+
+    @Override
+    public Configuration getConf() {
+        return conf;
+    }
+
+    @Override
+    public void setConf(Configuration conf) {
+        this.conf = conf;
+        parserFactory = new ParserFactory(conf);
+        maxParseTime = conf.getInt("parser.timeout", DEFAULT_MAX_PARSE_TIME);
+        sig = SignatureFactory.getSignature(conf);
+        filters = new URLFilters(conf);
+        normalizers = new URLNormalizers(conf, URLNormalizers.SCOPE_OUTLINK);
+        int maxOutlinksPerPage = conf.getInt("db.max.outlinks.per.page", 100);
+        maxOutlinks = (maxOutlinksPerPage < 0) ? Integer.MAX_VALUE : maxOutlinksPerPage;
+        ignoreExternalLinks = conf.getBoolean("db.ignore.external.links", false);
+        executorService = Executors.newCachedThreadPool(new ThreadFactoryBuilder().setNameFormat("parse-%d").setDaemon(true).build());
+    }
+
+    public Parse parse(String url, WebPage page) throws ParserNotFound, ParserException{
+        Parser[] parsers = null;
+
+        String contentType = TableUtil.toString(page.getContentType());
+        parsers = this.parserFactory.getParsers(contentType, url);
+        for (int i = 0; i < parsers.length; i++) {
+            if(LOG.isDebugEnabled()) {
+                LOG.debug("Parsing [" + url + "] with [" + parsers[i] + "]");
+            }
+            Parse parse = null;
+            if (maxParseTime != -1) {
+                parse = runParser(parsers[i], url, page);
+            } else {
+                parse = parsers[i].getParse(url, page);
+            }
+            if (parse != null && ParseStatusUtils.isSuccess(parse.getParseStatus())) {
+                return parse;
+            }
+        }
+        LOG.warn("Unable to successfully parse content " + url + " of type " + contentType);
+        return ParseStatusUtils.getEmptyParse(new ParserException("Unable to successfully parse content"), null);
+    }
+
+    private Parse runParser(Parser p, String url, WebPage page) {
+        ParseCallable pc = new ParseCallable(p, page, url);
+        Future<Parse> task = executorService.submit(pc);
+        Parse res = null;
+        try {
+            res = task.get(maxParseTime, TimeUnit.SECONDS);
+        } catch (Exception e) {
+            LOG.warn("Error parsing " + url, e);
+            task.cancel(true);
+        } finally {
+            pc = null;
+        }
+        return res;
+    }
+
+    public void process(String key, WebPage page) {
+        String url = TableUtil.unreverseUrl(key);
+        byte status = page.getStatus().byteValue();
+        if (status != CrawlStatus.STATUS_FETCHED) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Skipping " + url + " as status is: " + CrawlStatus.getName(status));
+            }
+            return;
+        }
+        Parse parse;
+        try {
+            parse = parse(url, page);
+        } catch (ParserNotFound e) {
+            LOG.warn("No suitable parser found: " + e.getMessage());
+            return;
+        } catch (final Exception e) {
+            LOG.warn("Error parsing: " + url + ": " + StringUtils.stringifyException(e));
+            return;
+        }
+        if (parse == null) {
+            return;
+        }
+        com.nutch.storage.ParseStatus pstatus = parse.getParseStatus();
+        page.setParseStatus(pstatus);
+        if (ParseStatusUtils.isSuccess(pstatus)) {
+            if(pstatus.getMajorCode() == ParseStatusCodes.SUCCESS_REDIRECT) {
+                String newUrl = ParseStatusUtils.getMessage(pstatus);
+                int refreshTime = Integer.parseInt(ParseStatusUtils.getArg(pstatus, 1));
+                try {
+                    newUrl = normalizers.normalize(newUrl, URLNormalizers.SCOPE_FETCHER);
+                    if (newUrl == null) {
+                        LOG.warn("redirect normalized to null " + url);
+                        return;
+                    }
+                    try {
+                        newUrl = filters.filter(newUrl);
+                    } catch (URLFilterException e) {
+                        return;
+                    }
+                    if(newUrl == null) {
+                        LOG.warn("redirect filtered to null " + url);
+                        return;
+                    }
+                } catch (MalformedURLException e){
+                    LOG.warn("malformed url exception parsing redirect " + url);
+                    return;
+                }
+                page.getOutlinks().put(new Utf8(newUrl), new Utf8());
+                page.getMetadata().put(FetcherJob.REDIRECT_DISCOVERED, TableUtil.YES_VAL);
+                if(newUrl == null || newUrl.equals(url)) {
+                    String reprUrl = URLUtil.chooseRepr(url, newUrl, refreshTime < FetcherJob.PERM_REFRESH_TIME);
+                    if(reprUrl == null) {
+                        LOG.warn("reprUrl==null for " + url);
+                        return;
+                    } else {
+                        page.setReprUrl(new Utf8(reprUrl));
+                    }
+                }
+            } else {
+                page.setText(new Utf8(parse.getText()));
+                page.setTitle(new Utf8(parse.getTitle()));
+                ByteBuffer prevSig = page.getSignature();
+                if(prevSig != null) {
+                    page.setPrevSignature(prevSig);
+                }
+                final  byte[] signature = sig.calculate(page);
+                page.setSignature(ByteBuffer.wrap(signature));
+                if(page.getOutlinks() != null) {
+                    page.getOutlinks().clear();
+                }
+                final Outlink[] outLinks = parse.getOutlinks();
+                int outlinksToStore = Math.min(maxOutlinks, outLinks.length);
+                String fromHost;
+                if (ignoreExternalLinks) {
+                    try {
+                        fromHost = new URL(url).getHost().toLowerCase();
+                    } catch (final MalformedURLException e) {
+                        fromHost = null;
+                    }
+                } else {
+                    fromHost = null;
+                }
+                int validCount = 0;
+                for(int i = 0; validCount < outlinksToStore && i < outLinks.length; i++) {
+                    String toUrl = outLinks[i].getToUrl();
+                    try {
+                        toUrl = normalizers.normalize(toUrl, URLNormalizers.SCOPE_OUTLINK);
+                        toUrl = filters.filter(toUrl);
+                    } catch (MalformedURLException e) {
+                        continue;
+                    } catch (URLFilterException e) {
+                        continue;
+                    }
+                    if (toUrl == null) {
+                        continue;
+                    }
+                    Utf8 utf8ToUrl = new Utf8(toUrl);
+                    if (page.getOutlinks().get(utf8ToUrl) != null) {
+                        continue;
+                    }
+                    String toHost;
+                    if (ignoreExternalLinks) {
+                        try {
+                            toHost = new URL(toUrl).getHost().toLowerCase();
+                        } catch (final MalformedURLException e) {
+                            toHost = null;
+                        }
+                        if (toHost == null || !toHost.equals(fromHost)) {
+                            continue;
+                        }
+                    }
+                    validCount++;
+                    page.getOutlinks().put(utf8ToUrl, new Utf8(outLinks[i].getAnchor()));
+                }
+                Utf8 fetchMark = Mark.FETCH_MARK.checkMark(page);
+                if (fetchMark != null) {
+                    Mark.PARSE_MARK.putMark(page, fetchMark);
+                }
+            }
+        }
+    }
+}

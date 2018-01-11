@@ -6,7 +6,7 @@ import com.nutch.fetcher.FetcherJob;
 import com.nutch.crawl.IndexingJob;
 import com.nutch.crawl.GeneratorJob;
 import com.nutch.crawl.InjectorJob;
-import com.nutch.crawl.ParserJob;
+import com.nutch.parse.ParserJob;
 import com.nutch.crawl.DbUpdaterJob;
 import com.nutch.crawl.WebTableReader;
 import com.nutch.util.NutchTool;

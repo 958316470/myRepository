@@ -1,7 +1,7 @@
 package com.nutch.fetcher;
 
 import com.nutch.crawl.CrawlStatus;
-import com.nutch.crawl.ParserJob;
+import com.nutch.parse.ParserJob;
 import com.nutch.host.HostDb;
 import com.nutch.net.URLFilterException;
 import com.nutch.net.URLFilters;

@@ -2,11 +2,13 @@ package com.xyd;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.text.SimpleDateFormat;
+
 public class Demo {
 
     public static void main(String[] args) {
-        Integer value = 4;
-        out(value);
+      String str = "E4A30F865E5486CC212C2A3D814A16C9";
+      System.out.println(str.length());
     }
 
     public static String formatStr(String name,int value) {
