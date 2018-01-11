@@ -1,6 +1,7 @@
 package com.nutch.fetcher;
 
 import com.nutch.crawl.CrawlStatus;
+import com.nutch.parse.ParseUtil;
 import com.nutch.parse.ParserJob;
 import com.nutch.host.HostDb;
 import com.nutch.net.URLFilterException;
@@ -19,7 +20,6 @@ import org.apache.gora.mapreduce.GoraReducer;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.IntWritable;
 import org.slf4j.Logger;
-import sun.net.www.ParseUtil;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -41,7 +41,7 @@ public class FetcherReducer extends GoraReducer<IntWritable, FetchEntry, String,
     private final AtomicInteger pages = new AtomicInteger(0);
     private final AtomicInteger errors = new AtomicInteger(0);
     private QueueFeeder feeder;
-    private final List<FetchterThread> fetcherThreads = new ArrayList<FetchterThread>();
+    private final List<FetcherThread> fetcherThreads = new ArrayList<FetcherThread>();
     private FetchItemQueues fetchQueues;
     private boolean storingContent;
     private boolean parse;
@@ -520,7 +520,7 @@ public class FetcherReducer extends GoraReducer<IntWritable, FetchEntry, String,
                 }
             }
             page.getOutlinks().put(new Utf8(newUrl), new Utf8());
-            page.getMarkers().put(FetcherJob.REDIRECT_DISCOVERED, TableUtil.YES_VAL);
+            page.getMetadata().put(FetcherJob.REDIRECT_DISCOVERED, TableUtil.YES_VAL);
             reprUrl = URLUtil.chooseRepr(reprUrl, newUrl, temp);
             if (reprUrl == null) {
                 LOG.warn("reprUrl==null");
@@ -675,7 +675,7 @@ public class FetcherReducer extends GoraReducer<IntWritable, FetchEntry, String,
         feeder = new QueueFeeder(context, fetchQueues, threadCount * maxFeedPerThread);
         feeder.start();
         for (int i = 0; i < threadCount; i++) {
-            FetchterThread ft = new FetchterThread(context, i);
+            FetcherThread ft = new FetcherThread(context, i);
             fetcherThreads.add(ft);
             ft.start();
         }
@@ -736,7 +736,7 @@ public class FetcherReducer extends GoraReducer<IntWritable, FetchEntry, String,
                 if (LOG.isWarnEnabled() && activeThreads.get() > 0) {
                     LOG.warn("Aborting with " + activeThreads + " hung threads.");
                     for (int i = 0; i < fetcherThreads.size(); i++) {
-                        FetchterThread thread = fetcherThreads.get(i);
+                        FetcherThread thread = fetcherThreads.get(i);
                         if (thread.isAlive()) {
                             LOG.warn("Thread #" + i + " hung while processing " + thread.reprUrl);
                             if (LOG.isDebugEnabled()) {
