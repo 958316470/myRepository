@@ -1,7 +1,7 @@
 package com.nutch.fetcher;
 
 import com.nutch.crawl.GeneratorJob;
-import com.nutch.crawl.NutchJob;
+import com.nutch.util.NutchJob;
 import com.nutch.parse.ParserJob;
 import com.nutch.crawl.URLPartitioner;
 import com.nutch.metadata.Nutch;

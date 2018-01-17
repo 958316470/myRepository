@@ -1,7 +1,7 @@
 package com.nutch.parse;
 
 import com.nutch.crawl.GeneratorJob;
-import com.nutch.crawl.NutchJob;
+import com.nutch.util.NutchJob;
 import com.nutch.crawl.SignatureFactory;
 import com.nutch.metadata.HttpHeaders;
 import com.nutch.metadata.Nutch;

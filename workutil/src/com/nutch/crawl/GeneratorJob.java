@@ -4,6 +4,7 @@ import com.nutch.metadata.Nutch;
 import com.nutch.storage.StorageUtils;
 import com.nutch.storage.WebPage;
 import com.nutch.util.NutchConfiguration;
+import com.nutch.util.NutchJob;
 import com.nutch.util.NutchTool;
 import com.nutch.util.ToolUtil;
 import org.apache.gora.util.TimingUtil;

@@ -21,7 +21,7 @@ public interface ConfManager {
 
     public void delete(String confId);
 
-    public void setPropeerty(String confId,String propName,String propValue);
+    public void setProperty(String confId,String propName,String propValue);
 
     public String create(NutchConfig nutchConfig);
 }
