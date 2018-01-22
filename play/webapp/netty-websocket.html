@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Netty WebSocket TimeServer</title>
+</head>
+<body>
+<br>
+<script type="text/javascript">
+    var socket;
+    if(!window.WebSocket){
+        window.WebSocket = window.MozWebSocket;
+    }
+    if (window.WebSocket){
+        socket = new WebSocket("ws://localhost:8080/websocket");
+        socket.onmessage = function (event) {
+            var ta = document.getElementById("responseText");
+            ta.value = "";
+            ta.value = event.data;
+        };
+        socket.onopen = function (event) {
+            var ta = document.getElementById("responseText");
+            ta.value = "打开WebSocket服务正常，该浏览器支持WebSocket";
+        };
+        socket.onclose = function (p1) {
+            var ta = document.getElementById("responseText");
+            ta.value = "";
+            ta.value = "WebSocket关闭";
+        };
+    } else {
+        alert("该浏览器不支持WebSocket");
+    }
+    function sendMessage(message) {
+        if (!window.WebSocket){
+            return;
+        }
+        if (socket.readyState == WebSocket.OPEN) {
+            socket.send(message);
+        } else {
+            alert("WebSocket 服务没有建立成功!")
+        }
+    }
+</script>
+<form onsubmit="return false;">
+    <input type="text" value="Netty实践" name = "message" />
+    <br><br>
+    <input type="button" value="发送websocket消息" onclick="sendMessage(this.form.message.value)" />
+    <hr color="blue">
+    <h3>服务器响应消息</h3>
+    <textarea id="responseText" style="height: 300px;width: 500px"></textarea>
+</form>
+</body>
+</html>
