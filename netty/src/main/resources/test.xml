@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<response>
+    <status>1</status>
+    <info>OK</info>
+    <infocode>10000</infocode>
+    <count>1</count>
+    <geocodes type="list">
+        <geocode>
+            <formatted_address>北京市西城区西环广场|T|2座</formatted_address>
+            <province>北京市</province>
+            <citycode>010</citycode>
+            <city>北京市</city>
+            <district>西城区</district>
+            <township></township>
+            <neighborhood>
+                <name></name>
+                <type></type>
+            </neighborhood>
+            <building>
+                <name></name>
+                <type></type>
+            </building>
+            <adcode>110102</adcode>
+            <street></street>
+            <number></number>
+            <location>116.352425,39.941568</location>
+            <level>门牌号</level>
+        </geocode>
+    </geocodes>
+</response>

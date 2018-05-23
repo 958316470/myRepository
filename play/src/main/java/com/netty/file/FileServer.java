@@ -17,7 +17,7 @@ import io.netty.handler.stream.ChunkedWriteHandler;
  */
 public class FileServer {
 
-    private static final String FILE_PATH = "/myRepository/play/src/main/java/com/netty/";
+    private static final String FILE_PATH = "/myRepository/";
 
     public void run(int port, String url) throws Exception {
         EventLoopGroup bossGroup = new NioEventLoopGroup();
@@ -40,8 +40,8 @@ public class FileServer {
                             socketChannel.pipeline().addLast("fileServerHandler", new FileServerHandler(url));
                         }
                     });
-            ChannelFuture f = b.bind("127.0.0.1", port).sync();
-            System.out.println("HTTP 文件目录服务器启动，网址是： http://127.0.0.1:" + port + url );
+            ChannelFuture f = b.bind("192.168.1.124", port).sync();
+            System.out.println("HTTP 文件目录服务器启动，网址是： http://192.168.1.124:" + port + url );
             f.channel().closeFuture().sync();
         } finally {
             bossGroup.shutdownGracefully();
