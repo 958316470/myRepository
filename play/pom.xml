@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>person-demo</groupId>
     <artifactId>play</artifactId>
-    <packaging>war</packaging>
+    <packaging>jar</packaging>
     <version>1.0</version>
     <dependencies>
         <!-- https://mvnrepository.com/artifact/org.springframework/spring-context -->
@@ -75,91 +75,34 @@
         </dependency>
     </dependencies>
     <build>
-        <sourceDirectory>${basedir}/src/main/java</sourceDirectory>
-        <outputDirectory>${basedir}/webapp/WEB-INF/classes</outputDirectory>
-        <resources>
-            <resource>
-                <directory>${basedir}/src/main/resources</directory>
-                <excludes>
-                    <exclude>**/*.java</exclude>
-                </excludes>
-            </resource>
-        </resources>
         <plugins>
-            <plugin>
-                <artifactId>maven-war-plugin</artifactId>
-                <version>2.1.1</version>
-                <configuration>
-                    <webappDirectory>${basedir}/webapp</webappDirectory>
-                    <warSourceDirectory>${basedir}/webapp</warSourceDirectory>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-checkstyle-plugin</artifactId>
-                <version>2.7</version>
-            </plugin>
 
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-resources-plugin</artifactId>
-                <version>2.4.3</version>
+                <artifactId>maven-assembly-plugin</artifactId>
                 <configuration>
-                    <encoding>UTF-8</encoding>
-                </configuration>
+                    <appendAssemblyId>false</appendAssemblyId>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                    <archive>
+                        <manifest>
+                            <!-- 此处指定main方法入口的class -->
+                            <mainClass>com.netty.file.FileServer</mainClass>
+                        </manifest>
+                    </archive>
+                    </configuration>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>assembly</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.3.2</version>
-                <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
-                    <encoding>UTF-8</encoding>
-                </configuration>
-            </plugin>
-            <plugin>
-                <artifactId>maven-clean-plugin</artifactId>
-                <version>2.4.1</version>
-                <configuration>
-                    <filesets>
-                        <fileset>
-                            <directory>${basedir}/webapp/WEB-INF/</directory>
-                            <includes>
-                                <include>classes/**</include>
-                                <include>lib/**</include>
-                            </includes>
-                        </fileset>
 
-                        <fileset>
-                            <directory>${basedir}/webapp</directory>
-                            <includes>
-                                <include>.svn</include>
-                                <include>WEB-INF/.svn</include>
-                                <include>META-INF/.svn</include>
-                            </includes>
-                        </fileset>
-                    </filesets>
-                </configuration>
-            </plugin>
-            <!-- jetty插件 -->
-            <plugin>
-                <groupId>org.eclipse.jetty</groupId>
-                <artifactId>jetty-maven-plugin</artifactId>
-                <version>9.3.7.v20160115</version>
-                <configuration>
-                    <!-- 扫面间隔 -->
-                    <scanIntervalSeconds>1</scanIntervalSeconds>
-                    <httpConnector>
-                        <!-- 端口号 -->
-                        <port>8080</port>
-                    </httpConnector>
-                    <webApp>
-                        <!-- 上下文根 -->
-                        <contextPath>/play</contextPath>
-                    </webApp>
-                </configuration>
-            </plugin>
         </plugins>
     </build>
+
 </project>
